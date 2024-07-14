@@ -16,26 +16,32 @@ export const Config: Schema<Config> = Schema.object({})
 export function apply(ctx: Context) {
   ctx.plugin(Database);
 
-  ctx.command('twitch.sub <name> <...guildId:string>').action(async (_, name, ...guildId) => {
-    let info;
-    try {
-      info = await fetchChannel(name);
-    } catch (e) {
-      return `无法订阅 ${name}：${e}`;
-    }
-    await ctx.database.upsert('twitch.channel', [{ id: name, targetIDs: guildId }]);
-    return `成功订阅 ${info.displayName}。`;
-  });
+  const cmd = ctx.command('twitch', 'Twitch 直播状态推送', { authority: 3 });
 
-  ctx.command('twitch.unsub <name>').action(async (_, name) => {
-    const result = await ctx.database.remove('twitch.channel', name);
-    if (result.matched === 0) {
-      return `并没有订阅过 ${name}。`;
-    }
-    return `成功退订 ${name}。`;
-  });
+  cmd.subcommand('.sub <name> <...guildId:string>', '订阅频道')
+    .example('twitch sub prod 1234 5678')
+    .action(async (_, name, ...guildId) => {
+      let info;
+      try {
+        info = await fetchChannel(name);
+      } catch (e) {
+        return `无法订阅 ${name}：${e}`;
+      }
+      await ctx.database.upsert('twitch.channel', [{ id: name, targetIDs: guildId }]);
+      return `成功订阅 ${info.displayName}。`;
+    });
 
-  ctx.command('twitch.list').action(async () => {
+  cmd.subcommand('.unsub <name>', '退订频道')
+    .example('twitch unsub prod')
+    .action(async (_, name) => {
+      const result = await ctx.database.remove('twitch.channel', name);
+      if (result.matched === 0) {
+        return `并没有订阅过 ${name}。`;
+      }
+      return `成功退订 ${name}。`;
+    });
+
+  cmd.subcommand('.list', '列出已订阅频道').action(async () => {
     const rows = await ctx.database.get('twitch.channel', {}) as Database.TwitchChannel[];
     if (rows.length === 0) {
       return '未订阅任何频道。';
@@ -43,7 +49,7 @@ export function apply(ctx: Context) {
     return '已订阅频道：\n' + rows.map((row) => `* ${row.id}: ` + row.targetIDs.join(', ')).join('\n');
   });
 
-  ctx.command('twitch.refresh').action(async () => {
+  cmd.subcommand('.refresh', '强制刷新').action(async () => {
     await refresh(ctx);
     return '刷新完毕。';
   });
