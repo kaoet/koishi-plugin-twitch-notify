@@ -1,4 +1,4 @@
-import { Context, Schema } from 'koishi';
+import { Context, Schema, h } from 'koishi';
 import { } from 'koishi-plugin-puppeteer';
 import moment from 'moment';
 import { ChannelInfo, fetchChannel } from './twitch';
@@ -36,14 +36,14 @@ export function apply(ctx: Context) {
   });
 
   ctx.command('twitch.list').action(async () => {
-    const rows: Database.TwitchChannel[] = await ctx.database.get('twitch.channel', {});
+    const rows = await ctx.database.get('twitch.channel', {}) as Database.TwitchChannel[];
     if (rows.length === 0) {
       return '未订阅任何频道。';
     }
     return '已订阅频道：\n' + rows.map((row) => `* ${row.id}: ` + row.targetIDs.join(', ')).join('\n');
   });
 
-  ctx.command('twitch.refresh', { hidden: true }).action(async () => {
+  ctx.command('twitch.refresh').action(async () => {
     await refresh(ctx);
     return '刷新完毕。';
   });
@@ -115,5 +115,5 @@ async function startStreamingMessage(ctx: Context, info: ChannelInfo): Promise<s
 
 async function endStreamingMessage(info: ChannelInfo, streamStartTime: Date): Promise<string> {
   const duration = moment.duration(moment().diff(moment(streamStartTime)));
-  return <img src={info.profileImageURL} /> + `${info.displayName} 下播了。\n本次直播了${Math.floor(duration.asHours())}小时${duration.minutes()}分钟${duration.seconds()}秒。\nhttps://www.twitch.tv/${info.name}`;
+  return h('img', { src: info.profileImageURL }) + `${info.displayName} 下播了。\n本次直播了${Math.floor(duration.asHours())}小时${duration.minutes()}分钟${duration.seconds()}秒。\nhttps://www.twitch.tv/${info.name}`;
 }

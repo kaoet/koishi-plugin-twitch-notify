@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-twitch-notify",
   "description": "Notify live stream status of Twitch.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "contributors": [
     "Kaoet Ibe <kaoet.ibe@outlook.com>"
   ],
