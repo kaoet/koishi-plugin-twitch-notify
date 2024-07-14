@@ -1,7 +1,14 @@
 {
   "name": "koishi-plugin-twitch-notify",
   "description": "Notify live stream status of Twitch.",
-  "version": "0.0.1",
+  "version": "1.0.0",
+  "contributors": [
+    "Kaoet Ibe <kaoet.ibe@outlook.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kaoet/koishi-plugin-twitch-notify.git"
+  },
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -12,6 +19,7 @@
   "keywords": [
     "chatbot",
     "koishi",
+    "twitch",
     "plugin"
   ],
   "peerDependencies": {
@@ -20,5 +28,17 @@
   "dependencies": {
     "koishi-plugin-puppeteer": "^3.8.4",
     "moment": "^2.30.1"
+  },
+  "koishi": {
+    "description": {
+      "en": "Notify live stream status of Twitch.",
+      "zh": "通知Twitch的直播状态。"
+    },
+    "service": {
+      "required": [
+        "database",
+        "puppeteer"
+      ]
+    }
   }
 }

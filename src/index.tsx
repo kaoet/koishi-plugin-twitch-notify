@@ -43,8 +43,9 @@ export function apply(ctx: Context) {
     return '已订阅频道：\n' + rows.map((row) => `* ${row.id}: ` + row.targetIDs.join(', ')).join('\n');
   });
 
-  ctx.command('twitch.refresh').action(async () => {
+  ctx.command('twitch.refresh', { hidden: true }).action(async () => {
     await refresh(ctx);
+    return '刷新完毕。';
   });
 
   let disposeTimer: () => void;
@@ -99,7 +100,7 @@ async function onebotSend(ctx: Context, targetID: string, content: string) {
       for (const guild of (await bot.getGuildList()).data) {
         if (guild.id === targetID) {
           await bot.sendMessage(guild.id, content);
-          return 
+          return
         }
       }
     }
@@ -114,5 +115,5 @@ async function startStreamingMessage(ctx: Context, info: ChannelInfo): Promise<s
 
 async function endStreamingMessage(info: ChannelInfo, streamStartTime: Date): Promise<string> {
   const duration = moment.duration(moment().diff(moment(streamStartTime)));
-  return <img src={info.profileImageURL}/> + `${info.displayName} 下播了。\n本次直播了${Math.floor(duration.asHours())}小时${duration.minutes()}分钟${duration.seconds()}秒。\nhttps://www.twitch.tv/${info.name}`;
+  return <img src={info.profileImageURL} /> + `${info.displayName} 下播了。\n本次直播了${Math.floor(duration.asHours())}小时${duration.minutes()}分钟${duration.seconds()}秒。\nhttps://www.twitch.tv/${info.name}`;
 }
